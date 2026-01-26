@@ -19,7 +19,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'node20' // Name must match the one you configured in Jenkins
+        nodejs 'node18' // Name must match the one you configured in Jenkins
     }
         environment {
         // credentials for git
