@@ -52,17 +52,20 @@ pipeline {
                 git(
                     branch: env.branchName,
                     credentialsId: "${env.GIT_CREDENTIALS}",
-                    url: 'https://github.com/vincentino1/frontend.git'
+                    url: 'https://github.com/vincentino1/account-service.git'
                 )
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                dir('angular-app') {
                     sh 'npm install'
+            }
+        }
+
+        stage('Build Typescript') {
+            steps {
                     sh 'npm run build'
-                }
             }
         }
     }
