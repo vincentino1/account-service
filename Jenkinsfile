@@ -81,13 +81,12 @@ always-auth=true
 email=myapp-developer@test.com
 """
                         sh 'npm ci'
+                        sh 'npm whoami'
                     }
             }
 
             post {
-                always {
-                        sh 'rm -f .npmrc'
-                }
+                always { sh 'rm -f .npmrc'}
             }
         }
 
@@ -121,9 +120,7 @@ email=myapp-developer@test.com
             }
 
             post {
-                always {
-                        sh 'rm -f .npmrc'
-                }
+                always { sh 'rm -f .npmrc'}
             }
         }
 
@@ -162,6 +159,9 @@ email=myapp-developer@test.com
     }
 
     post {
+        always {
+            sh 'docker rmi ${IMAGE_NAME} || true'  // Cleanup
+        }
         success {
             echo 'Pipeline completed successfully.'
         }
