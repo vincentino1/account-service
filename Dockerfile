@@ -1,5 +1,5 @@
 # Use a lightweight Node.js base image
-FROM node:18-alpine
+FROM 16-52-79-103.sslip.io/myapp-npm-group/node:18-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Production stage 
-FROM node:18-alpine AS production
+FROM 16-52-79-103.sslip.io/myapp-npm-group/node:18-alpine AS production
 
 WORKDIR /app
 
