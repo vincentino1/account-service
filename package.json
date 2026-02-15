@@ -39,4 +39,11 @@
     "typescript-eslint": "^8.0.0",
     "vitest": "^2.0.5"
   }
+  "files": [
+  "dist/",
+  "README.md",
+  "LICENSE",
+  ".env.example"
+]
+
 }
