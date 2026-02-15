@@ -78,7 +78,6 @@ pipeline {
 registry=https://16-52-79-103.sslip.io/repository/myapp-npm-group/
 always-auth=true
 //16-52-79-103.sslip.io/repository/myapp-npm-group/:_auth=\${NEXUS_NPM_TOKEN}
-email=myapp-developer@test.com
 """
                         sh 'npm ci'
                         sh 'npm whoami'
