@@ -1,42 +1,40 @@
-# Use a lightweight Node.js base image
-FROM 16-52-79-103.sslip.io/myapp-npm-group/node:18-alpine
+# Private Nexus Docker registry
+ARG DOCKER_PRIVATE_REPO=16-52-79-103.sslip.io/myapp-docker-group
 
-# Set the working directory inside the container
+# Builder stage
+FROM ${DOCKER_PRIVATE_REPO}/node:18-alpine AS builder
+
 WORKDIR /app
 
-# Copy package files to install dependencies
+# Install dependencies
 COPY package*.json ./
-
-# Install project dependencies
 RUN npm ci
 
-# Copy the rest of your application code
+# Copy source and build
 COPY . .
-
-# Build TypeScript 
 RUN npm run build
 
-# Production stage 
-FROM 16-52-79-103.sslip.io/myapp-npm-group/node:18-alpine AS production
+# Production stage
+FROM ${DOCKER_PRIVATE_REPO}/node:18-alpine AS production
 
 WORKDIR /app
 
-# Create non-root user 
-RUN addgroup -g 1001 -S nodejs && \ 
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
     adduser -S appuser -u 1001
 
-# Copy only production dependencies 
-COPY package*.json ./ 
-RUN npm ci --only=production && npm cache clean --force 
+# Install production dependencies only
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
 
-# Copy compiled app from builder 
+# Copy built app from builder
 COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
 
-# Switch to non-root user 
-USER appuser 
+USER appuser
 
-EXPOSE 3001 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \ CMD wget -qO- http://localhost:3001/health || exit 1 
+EXPOSE 3001
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:3001/health || exit 1
 
 CMD ["node", "dist/server.js"]
-
