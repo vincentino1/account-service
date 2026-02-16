@@ -72,9 +72,9 @@ pipeline {
                     string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NEXUS_NPM_TOKEN')
                 ]) {
                     writeFile file: '.npmrc', text: """
-registry=https://16-52-79-103.sslip.io/repository/myapp-npm-group/
+registry=https://${REGISTRY_HOSTNAME}/repository/myapp-npm-group/
 always-auth=true
-//16-52-79-103.sslip.io/repository/myapp-npm-group/:_auth=\${NEXUS_NPM_TOKEN}
+//${REGISTRY_HOSTNAME}/repository/myapp-npm-group/:_auth=\${NEXUS_NPM_TOKEN}
 """
                     sh 'npm ci'
                     sh 'npm whoami'
