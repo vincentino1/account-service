@@ -27,7 +27,7 @@ pipeline {
 
         // Nexus Docker Registry
         DOCKER_REPO           = 'myapp-docker-hosted'
-        REGISTRY_HOSTNAME     = '3-98-125-121.sslip.io'
+        REGISTRY_HOSTNAME     = '3-98-125-121.sslip.io' 
         REVERSE_PROXY_BASE_URL = 'https://3-98-125-121.sslip.io'
         DOCKER_CREDENTIALS_ID = 'docker-registry-creds'
     }
@@ -36,7 +36,7 @@ pipeline {
 
         stage('Webhook Debug') {
             steps {
-                echo "Branch: ${env.ref}"
+                echo "Branch: ${env.ref}" 
                 echo "Repo: ${env.repo_name}"
             }
         }
