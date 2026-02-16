@@ -76,7 +76,7 @@ registry=https://${REGISTRY_HOSTNAME}/repository/myapp-npm-group/
 always-auth=true
 //${REGISTRY_HOSTNAME}/repository/myapp-npm-group/:_auth=\${NEXUS_NPM_TOKEN}
 """
-                    sh 'npm ci'
+                    sh 'npm install'
                     sh 'npm whoami'
                 }
             }
