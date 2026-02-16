@@ -75,8 +75,11 @@ pipeline {
 registry=https://${REGISTRY_HOSTNAME}/repository/myapp-npm-group/
 always-auth=true
 //${REGISTRY_HOSTNAME}/repository/myapp-npm-group/:_auth=\${NEXUS_NPM_TOKEN}
-"""
-                    sh 'npm install'
+"""                    
+                    withEnv(['PUPPETEER_SKIP_DOWNLOAD=true']) {
+                        sh 'npm install --no-audit --no-fund'
+                    }
+            
                     sh 'npm whoami'
                 }
             }
