@@ -104,9 +104,9 @@ always-auth=true
                     string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NEXUS_NPM_TOKEN')
                 ]) {
                     writeFile file: '.npmrc', text: """
-registry=https://16-52-79-103.sslip.io/repository/myapp-npm-hosted/
+registry=https://${REGISTRY_HOSTNAME}/repository/myapp-npm-hosted/
 always-auth=true
-//16-52-79-103.sslip.io/repository/myapp-npm-hosted/:_auth=\${NEXUS_NPM_TOKEN}
+//${REGISTRY_HOSTNAME}/repository/myapp-npm-hosted/:_auth=\${NEXUS_NPM_TOKEN}
 email=myapp-developer@test.com
 """
                     sh 'npm publish'
