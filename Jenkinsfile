@@ -127,7 +127,8 @@ email=myapp-developer@test.com
                     env.IMAGE_NAME = "${NEXUS_URL}/${DOCKER_REPO}/${appName}:v${BUILD_NUMBER}"
 
                     docker.withRegistry("https://${NEXUS_URL}", "${DOCKER_CREDENTIALS_ID}") {
-                        docker.build(env.IMAGE_NAME)
+                        docker.build(env.IMAGE_NAME, "--build-arg DOCKER_PRIVATE_REPO=${NEXUS_URL}/myapp-docker-group .")
+
                     }
 
                     echo "Built image: ${env.IMAGE_NAME}"
@@ -162,6 +163,7 @@ email=myapp-developer@test.com
         }
     }
 }
+
 
 
 
