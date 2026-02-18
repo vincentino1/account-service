@@ -27,9 +27,9 @@ pipeline {
 
         // Nexus Docker Registry
         DOCKER_REPO           = 'myapp-docker-hosted'
-        REGISTRY_HOSTNAME     = '3-98-125-121.sslip.io' 
-        REVERSE_PROXY_BASE_URL = 'https://3-98-125-121.sslip.io'
         DOCKER_CREDENTIALS_ID = 'docker-registry-creds'
+
+        NEXUS_URL = 'repo.vinny-dev.com'
     }
 
     stages {
@@ -69,16 +69,14 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NEXUS_NPM_TOKEN')
+                    string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'TOKEN')
                 ]) {
                     writeFile file: '.npmrc', text: """
-registry=https://${REGISTRY_HOSTNAME}/repository/myapp-npm-group/
+registry=${NEXUS_URL}/repository/myapp-npm-group/
 always-auth=true
-//${REGISTRY_HOSTNAME}/repository/myapp-npm-group/:_auth=\${NEXUS_NPM_TOKEN}
+//${NEXUS_URL}/repository/myapp-npm-group/:_auth=\${TOKEN}
 """                    
-                    withEnv(['PUPPETEER_SKIP_DOWNLOAD=true']) {
-                        sh 'npm install --no-audit --no-fund'
-                    }
+                    sh 'npm install --no-audit --no-fund'
             
                     sh 'npm whoami'
                 }
@@ -104,12 +102,12 @@ always-auth=true
             when { expression { env.branchName == 'main' } }
             steps {
                 withCredentials([
-                    string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NEXUS_NPM_TOKEN')
+                    string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'TOKEN')
                 ]) {
                     writeFile file: '.npmrc', text: """
-registry=https://${REGISTRY_HOSTNAME}/repository/myapp-npm-hosted/
+registry=${NEXUS_URL}/repository/myapp-npm-hosted/
 always-auth=true
-//${REGISTRY_HOSTNAME}/repository/myapp-npm-hosted/:_auth=\${NEXUS_NPM_TOKEN}
+//${NEXUS_URL}/repository/myapp-npm-hosted/:_auth=\${TOKEN}
 email=myapp-developer@test.com
 """
                     sh 'npm publish'
@@ -126,9 +124,9 @@ email=myapp-developer@test.com
                     def pkg = readJSON file: 'package.json'
                     def appName = pkg.name
 
-                    env.IMAGE_NAME = "${REGISTRY_HOSTNAME}/${DOCKER_REPO}/${appName}:v${BUILD_NUMBER}"
+                    env.IMAGE_NAME = "${NEXUS_URL}/${DOCKER_REPO}/${appName}:v${BUILD_NUMBER}"
 
-                    docker.withRegistry("${REVERSE_PROXY_BASE_URL}", "${DOCKER_CREDENTIALS_ID}") {
+                    docker.withRegistry("https://${NEXUS_URL}", "${DOCKER_CREDENTIALS_ID}") {
                         docker.build(env.IMAGE_NAME)
                     }
 
@@ -141,7 +139,7 @@ email=myapp-developer@test.com
             when { expression { env.branchName == 'main' } }
             steps {
                 script {
-                    docker.withRegistry("${REVERSE_PROXY_BASE_URL}", "${DOCKER_CREDENTIALS_ID}") {
+                    docker.withRegistry("https://${NEXUS_URL}", "${DOCKER_CREDENTIALS_ID}") {
                         docker.image(env.IMAGE_NAME).push()
                     }
                     echo "Pushed Docker image: ${env.IMAGE_NAME}"
@@ -152,7 +150,9 @@ email=myapp-developer@test.com
 
     post {
         always {
-            sh 'docker rmi ${IMAGE_NAME} || true' // Cleanup
+            if (env.IMAGE_NAME) {
+                sh "docker rmi ${env.IMAGE_NAME} || true"
+            }
         }
         success {
             echo 'Pipeline completed successfully.'
@@ -162,6 +162,8 @@ email=myapp-developer@test.com
         }
     }
 }
+
+
 
 
 
