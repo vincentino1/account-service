@@ -24,12 +24,13 @@ pipeline {
     environment {
         // Git
         GIT_CREDENTIALS = 'github-creds'
+        GIT_BRANCH_URL = 'https://github.com/vincentino1/account-service.git'
 
         // Nexus Docker Registry
         DOCKER_REPO           = 'myapp-docker-hosted'
         DOCKER_CREDENTIALS_ID = 'docker-registry-creds'
 
-        NEXUS_URL = 'repo.vinny-dev.com'
+        // NEXUS_URL & DOCKER_REGISTRY_URL are set up as Jenkins environment variables
     }
 
     stages {
@@ -61,7 +62,7 @@ pipeline {
                 git(
                     branch: "${env.branchName}",
                     credentialsId: "${env.GIT_CREDENTIALS}",
-                    url: 'https://github.com/vincentino1/account-service.git'
+                    url: "${env.GIT_BRANCH_URL}"
                 )
             }
         }
@@ -124,10 +125,10 @@ email=myapp-developer@test.com
                     def pkg = readJSON file: 'package.json'
                     def appName = pkg.name
 
-                    env.IMAGE_NAME = "${NEXUS_URL}/${DOCKER_REPO}/${appName}:v${BUILD_NUMBER}"
+                    env.IMAGE_NAME = "${env.DOCKER_REGISTRY_URL}/${env.DOCKER_REPO}/${appName}:v${env.BUILD_NUMBER}"
 
-                    docker.withRegistry("https://${NEXUS_URL}", "${DOCKER_CREDENTIALS_ID}") {
-                        docker.build(env.IMAGE_NAME, "--build-arg DOCKER_PRIVATE_REPO=${NEXUS_URL}/myapp-docker-group .")
+                    docker.withRegistry("https://${env.DOCKER_REGISTRY_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
+                        docker.build(env.IMAGE_NAME, "--build-arg DOCKER_PRIVATE_REPO=${env.DOCKER_REGISTRY_URL}/${env.DOCKER_REPO} .")
 
                     }
 
@@ -140,7 +141,7 @@ email=myapp-developer@test.com
             when { expression { env.branchName == 'main' } }
             steps {
                 script {
-                    docker.withRegistry("https://${NEXUS_URL}", "${DOCKER_CREDENTIALS_ID}") {
+                    docker.withRegistry("https://${env.DOCKER_REGISTRY_URL}", "${DOCKER_CREDENTIALS_ID}") {
                         docker.image(env.IMAGE_NAME).push()
                     }
                     echo "Pushed Docker image: ${env.IMAGE_NAME}"
