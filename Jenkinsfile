@@ -27,7 +27,8 @@ pipeline {
         GIT_BRANCH_URL = 'https://github.com/vincentino1/account-service.git'
 
         // Nexus Docker Registry
-        DOCKER_REPO           = 'myapp-docker-hosted'
+        DOCKER_REPO_PUSH           = 'myapp-docker-hosted'
+        DOCKER_REPO_PULL           = 'myapp-docker-group'
         DOCKER_CREDENTIALS_ID = 'docker-registry-creds'
 
         // NEXUS_URL & DOCKER_REGISTRY_URL are set up as Jenkins environment variables
@@ -125,10 +126,10 @@ email=myapp-developer@test.com
                     def pkg = readJSON file: 'package.json'
                     def appName = pkg.name
 
-                    env.IMAGE_NAME = "${env.DOCKER_REGISTRY_URL}/${env.DOCKER_REPO}/${appName}:v${env.BUILD_NUMBER}"
+                    env.IMAGE_NAME = "${env.DOCKER_REGISTRY_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${env.BUILD_NUMBER}"
 
                     docker.withRegistry("https://${env.DOCKER_REGISTRY_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
-                        docker.build(env.IMAGE_NAME, "--build-arg DOCKER_PRIVATE_REPO=${env.DOCKER_REGISTRY_URL}/${env.DOCKER_REPO} .")
+                        docker.build(env.IMAGE_NAME, "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} .")
 
                     }
 
