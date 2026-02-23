@@ -115,7 +115,7 @@ pipeline {
                 configFileProvider([
                     configFile(
                         fileId: 'my-custom-npmrc',
-                        targetLocation: '.npmrc',
+                        targetLocation: '.npmrc'
                     )
                 ]) {
                     script {
@@ -168,8 +168,10 @@ pipeline {
 
     post {
         always {
-            if (env.IMAGE_NAME) {
-                sh "docker rmi ${env.IMAGE_NAME} || true"
+            script {
+                if (env.IMAGE_NAME) {
+                    sh "docker rmi ${env.IMAGE_NAME} || true"
+                }
             }
         }
 
