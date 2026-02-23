@@ -158,7 +158,7 @@ pipeline {
                         "${env.DOCKER_CREDENTIALS_ID}"
                     ) {
                         docker.image(env.IMAGE_NAME).push()
-                        docker.image(env.IMAGE_NAME).push(latest)
+                        docker.image(env.IMAGE_NAME).push('latest')
                     }
 
                     echo "Pushed Docker image: ${env.IMAGE_NAME}"
