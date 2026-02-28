@@ -39,7 +39,7 @@ RUN addgroup -g 1001 -S nodejs && \
 # Install production dependencies only
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --production
 
 # Copy built app from builder
 COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
